@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.6;
+pragma solidity ^0.7.6; // solc version vulnerble ?
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -15,6 +15,7 @@ import {Base64} from "lib/base64/base64.sol";
 /// 3. Users are allowed to get a refund of their ticket & `value` if they call the `refund` function
 /// 4. Every X seconds, the raffle will be able to draw a winner and be minted a random puppy
 /// 5. The owner of the protocol will set a feeAddress to take a cut of the `value`, and the rest of the funds will be sent to the winner of the puppy.
+
 contract PuppyRaffle is ERC721, Ownable {
     using Address for address payable;
 
@@ -77,7 +78,7 @@ contract PuppyRaffle is ERC721, Ownable {
     /// @notice duplicate entrants are not allowed
     /// @param newPlayers the list of players to enter the raffle
     function enterRaffle(address[] memory newPlayers) public payable {
-        require(msg.value == entranceFee * newPlayers.length, "PuppyRaffle: Must send enough to enter raffle");
+        require(msg.value == entranceFee * newPlayers.length, "PuppyRaffle: Must send enough to enter raffle"); 
         for (uint256 i = 0; i < newPlayers.length; i++) {
             players.push(newPlayers[i]);
         }
@@ -85,14 +86,14 @@ contract PuppyRaffle is ERC721, Ownable {
         // Check for duplicates
         for (uint256 i = 0; i < players.length - 1; i++) {
             for (uint256 j = i + 1; j < players.length; j++) {
-                require(players[i] != players[j], "PuppyRaffle: Duplicate player");
+                require(players[i] != players[j], "PuppyRaffle: Duplicate player");   // HERE YOU SHOULD TAKE THE DUPLICATE PLAYER OUT OF THE RAFFLE
             }
-        }
+        }  
         emit RaffleEnter(newPlayers);
     }
 
     /// @param playerIndex the index of the player to refund. You can find it externally by calling `getActivePlayerIndex`
-    /// @dev This function will allow there to be blank spots in the array
+    /// @dev This function will allow there to be blank spots in the array     // YOU DON'T WANT TO MAKE A BLANK SPOTS, BE SURE TO REMOVE THEM SO NO ONE CAN ENTER THE RAFFLE WITHOUT PAY
     function refund(uint256 playerIndex) public {
         address playerAddress = players[playerIndex];
         require(playerAddress == msg.sender, "PuppyRaffle: Only the player can refund");
